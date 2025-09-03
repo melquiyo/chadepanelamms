@@ -4,37 +4,54 @@
 <meta charset="UTF-8">
 <title>Chá de Panela - Lista de Presentes</title>
 <style>
+    /* Fonte e fundo */
     body {
-        font-family: Verdana, Geneva, Tahoma, sans-serif, sans-serif;
-        background: url("cafe.png") no-repeat center center fixed;
-        background-size:  100% cover;
+        font-family: Verdana, Geneva, sans-serif;
+        background: url("cafe.png") no-repeat center center;
+        background-size: cover; /* cobre toda a tela */
+        background-attachment: fixed;
         text-align: center;
         margin: 0;
         padding: 20px;
         color: #fff;
     }
+
+    /* Título */
     h1 {
         color: #fff;
+        font-family: Georgia, 'Times New Roman', serif;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
     }
+
+    /* Instrução */
     p {
         color: #fff;
         font-weight: bold;
         text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
     }
-    ul { list-style: none; padding: 0; }
+
+    /* Lista */
+    ul { 
+        list-style: none; 
+        padding: 0; 
+    }
+
     li {
-        background: rgba(255, 255, 255, 0.9); /* fundo translúcido */
+        background: rgba(255, 255, 255, 0.9);
         color: #000;
         padding: 10px;
         margin: 10px auto;
-        width: 320px;
+        width: 90%;       /* largura relativa para responsividade */
+        max-width: 320px; /* mantém tamanho em telas grandes */
         border-radius: 8px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+        word-wrap: break-word; /* quebra linhas longas */
     }
+
+    /* Botões */
     button {
         background: #6495ED;
         color: white;
@@ -43,15 +60,31 @@
         border-radius: 5px;
         cursor: pointer;
     }
+
     button:hover {
         background: #d35b87;
+    }
+
+    /* Responsividade adicional */
+    @media (max-width: 400px) {
+        body {
+            padding: 10px;
+        }
+        li {
+            padding: 8px;
+            font-size: 14px;
+        }
+        button {
+            padding: 5px 10px;
+            font-size: 13px;
+        }
     }
 </style>
 </head>
 <body>
 
 <h1>Lista de Presentes</h1>
-<p>Clique em "Escolher" para reservar um presente</p>
+<p>Clique em "Escolher"<br>para reservar um presente</p>
 
 <ul id="lista">
     <li><span>Jogo de Panelas</span> <button onclick="escolher(this)">Escolher</button></li>
@@ -111,40 +144,4 @@
 <br>
 <button onclick="pedirSenha()">Casamento M&M's</button>
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script>
-    let escolhidos = [];
-
-    function escolher(botao) {
-        let item = botao.parentElement.querySelector("span").innerText;
-        let nome = prompt("Digite seu nome para reservar este presente:");
-        if (nome) {
-            escolhidos.push({Presente: item, Nome: nome});
-            botao.parentElement.remove(); // remove da lista da tela
-            alert(`Obrigado, ${nome}! Você escolheu: ${item}`);
-        }
-    }
-
-    function pedirSenha() {
-        let senha = prompt("Digite a senha para acessar:");
-        if (senha === "03092025") {
-            exportarExcel();
-        } else if (senha !== null) {
-            alert("Senha incorreta!");
-        }
-    }
-
-    function exportarExcel() {
-        if (escolhidos.length === 0) {
-            alert("Nenhum presente foi escolhido ainda.");
-            return;
-        }
-        let ws = XLSX.utils.json_to_sheet(escolhidos);
-        let wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Presentes");
-        XLSX.writeFile(wb, "presentes_escolhidos.xlsx");
-    }
-</script>
-
-</body>
-</html>
+<script src="https://cdn.jsdelivr
