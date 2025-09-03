@@ -27,21 +27,28 @@
         text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
     }
 
-    ul { list-style: none; padding: 0; }
+    ul#lista {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* 4 colunas */
+        gap: 15px; /* espaço entre itens */
+    }
 
-    li {
+    ul#lista li {
         background: rgba(255, 255, 255, 0.9);
         color: #000;
         padding: 10px;
-        margin: 10px auto;
-        width: 90%;
-        max-width: 320px;
         border-radius: 8px;
         display: flex;
-        justify-content: space-between;
+        justify-content: space-between; /* texto à esquerda, botão à direita */
         align-items: center;
         box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
         word-wrap: break-word;
+    }
+
+    ul#lista li button {
+        width: 90px; /* largura fixa para alinhamento vertical */
     }
 
     button {
@@ -55,11 +62,10 @@
 
     button:hover { background: #d35b87; }
 
-    @media (max-width: 400px) {
-        body { padding: 10px; }
-        li { padding: 8px; font-size: 14px; }
-        button { padding: 5px 10px; font-size: 13px; }
-    }
+    @media (max-width: 1200px) { ul#lista { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 900px)  { ul#lista { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px)  { ul#lista { grid-template-columns: 1fr; } }
+
 </style>
 
 <!-- Firebase v12 módulo -->
@@ -68,9 +74,9 @@
   import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyDYxLGAEEFazeMo9_JXVkwRdVxOth7G9QA",
+    apiKey: "SUA_API_KEY",
     authDomain: "casamento-mms.firebaseapp.com",
-    databaseURL: "https://casamento-mms-default-rtdb.firebaseio.com/", // ✅ Linha adicionada
+    databaseURL: "https://casamento-mms-default-rtdb.firebaseio.com/",
     projectId: "casamento-mms",
     storageBucket: "casamento-mms.firebasestorage.app",
     messagingSenderId: "152858110235",
@@ -81,7 +87,6 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // Escolher presente
   function escolher(botao) {
     const item = botao.parentElement.querySelector("span").innerText;
     const nome = prompt("Digite seu nome para reservar este presente:");
@@ -93,7 +98,6 @@
     }
   }
 
-  // Pedir senha para exportar
   function pedirSenha() {
     const senha = prompt("Digite a senha para acessar:");
     if (senha === "03092025") {
@@ -103,7 +107,6 @@
     }
   }
 
-  // Exportar Excel
   async function exportarExcelFirebase() {
     const snapshot = await get(ref(db, 'presentes'));
     const dados = snapshot.val() || {};
@@ -117,7 +120,6 @@
     XLSX.writeFile(wb, "presentes_escolhidos.xlsx");
   }
 
-  // Atualiza lista em tempo real
   onValue(ref(db, 'presentes'), (snapshot) => {
     const dados = snapshot.val() || {};
     document.querySelectorAll('#lista li').forEach(li => {
@@ -126,13 +128,10 @@
     });
   });
 
-  // Torna as funções acessíveis no HTML
   window.escolher = escolher;
   window.pedirSenha = pedirSenha;
-
 </script>
 
-<!-- XLSX -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 </head>
@@ -142,7 +141,6 @@
 <p>Clique em "Escolher"<br>para reservar um presente</p>
 
 <ul id="lista">
-  <!-- Lista completa de presentes (como na sua lista original) -->
   <li><span>Jogo de Panelas</span> <button onclick="escolher(this)">Escolher</button></li>
   <li><span>Panela de Pressão</span> <button onclick="escolher(this)">Escolher</button></li>
   <li><span>Jogo de Talheres</span> <button onclick="escolher(this)">Escolher</button></li>
@@ -184,13 +182,13 @@
   <li><span>Garrafa de Café</span> <button onclick="escolher(this)">Escolher</button></li>
   <li><span>Chaleira Elétrica</span> <button onclick="escolher(this)">Escolher</button></li>
   <li><span>Pirex</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jogo de Toalhas <br>(Corpo e Rosto)</span> <button onclick="escolher(this)">Escolher</button></li>
+  <li><span>Jogo de Toalhas (Corpo e Rosto)</span> <button onclick="escolher(this)">Escolher</button></li>
   <li><span>Cestos Organizadores</span> <button onclick="escolher(this)">Escolher</button></li>
   <li><span>Tábua de Passar</span> <button onclick="escolher(this)">Escolher</button></li>
   <li><span>Cesto de Roupa</span> <button onclick="escolher(this)">Escolher</button></li>
   <li><span>Fronhas</span> <button onclick="escolher(this)">Escolher</button></li>
   <li><span>Varal de Roupas</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Mantas e Almofadas (Sofá)</span> <button onclick="escolher(this)">Escolher</button></li>
+  <li><span>Mantas e Almofadas para o Sofá</span> <button onclick="escolher(this)">Escolher</button></li>
   <li><span>Edredom</span> <button onclick="escolher(this)">Escolher</button></li>
   <li><span>Colcha</span> <button onclick="escolher(this)">Escolher</button></li>
   <li><span>Protetor de Colchão</span> <button onclick="escolher(this)">Escolher</button></li>
