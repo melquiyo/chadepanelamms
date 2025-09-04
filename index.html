@@ -28,24 +28,24 @@ body {
     }
 
     ul#lista {
-        list-style: none;
-        padding: 0;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr); /* 4 colunas */
-        gap: 15px;
+         list-style: none;
+         padding: 0;
+         display: grid;
+         grid-template-columns: repeat(2, 300px); /* ✅ largura fixa para cada coluna */
+         gap: 15px 30px; /* espaçamento entre itens e colunas */
+         justify-content: center; /* ✅ centraliza no meio do site */
     }
 
     ul#lista li {
-        background: rgba(255, 255, 255, 0.9);
-        color: #000;
-        padding: 8px;
-        max-width: 300px; /* largura menor para o item */
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start; /* texto à esquerda, botão próximo */
-        box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
-        word-wrap: break-word;
+       height: 40px; 
+       background: rgba(255, 255, 255, 0.8);
+       color: #000;
+       padding: 10px;
+       border-radius: 8px;
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
     }
 
     ul#lista li span {
@@ -151,6 +151,7 @@ body {
 <body>
 
 <h1>Lista de Presentes</h1>
+<h1>Sugestões</h1>
 <p>Clique em "Escolher"<br>para reservar um presente</p>
 
 <ul id="lista">
