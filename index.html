@@ -35,6 +35,12 @@ body {
          gap: 15px 30px; /* espaçamento entre itens e colunas */
          justify-content: center; /* ✅ centraliza no meio do site */
     }
+    /* ✅ Para telas pequenas (até 600px de largura), forçar 2 colunas */
+@media (max-width: 600px) {
+    ul#lista {
+        grid-template-columns: repeat(2, 1fr); /* 2 colunas iguais */
+        }
+}
 
     ul#lista li {
        height: 40px; 
