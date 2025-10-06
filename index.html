@@ -122,28 +122,45 @@
     }
   }
 
-  // Exportar Excel
-  async function exportarExcelFirebase() {
-    try {
-      const snapshot = await get(ref(db, "presentes"));
-      const dados = snapshot.val() || {};
-      const listaExcel = Object.keys(dados).map(item => ({
-        Presente: item,
-        Nome: dados[item].nome
-      }));
-      if (listaExcel.length === 0) {
-        alert("Nenhum presente escolhido ainda!");
-        return;
-      }
-      const ws = XLSX.utils.json_to_sheet(listaExcel);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Presentes");
-      XLSX.writeFile(wb, "presentes_escolhidos.xlsx");
-    } catch (e) {
-      console.error(e);
-      alert("Erro ao exportar planilha.");
+ // Exportar Excel (versão corrigida)
+async function exportarExcelFirebase() {
+  try {
+    // Aguarda carregar a lib XLSX se ainda não estiver disponível
+    if (typeof XLSX === "undefined") {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js";
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
     }
+
+    const snapshot = await get(ref(db, "presentes"));
+    const dados = snapshot.val();
+
+    if (!dados || Object.keys(dados).length === 0) {
+      alert("Nenhum presente escolhido ainda!");
+      return;
+    }
+
+    // Monta lista pro Excel
+    const listaExcel = Object.keys(dados).map(item => ({
+      Presente: item,
+      Nome: dados[item].nome || ""
+    }));
+
+    // Gera o arquivo Excel
+    const ws = XLSX.utils.json_to_sheet(listaExcel);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Presentes");
+    XLSX.writeFile(wb, "presentes_escolhidos.xlsx");
+
+  } catch (e) {
+    console.error("Erro ao exportar Excel:", e);
+    alert("Erro ao exportar planilha. Verifique o console (F12).");
   }
+}
 
   // Atualização em tempo real
   onValue(ref(db, "presentes"), snapshot => {
@@ -228,3 +245,4 @@
 
 </body>
 </html>
+
