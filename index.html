@@ -2,82 +2,90 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Chá de Panela - Lista de Presentes</title>
+<title>Lista de Presentes - Casamento M&M’s</title>
 <style>
-    body {
-        font-family: Verdana, Geneva, sans-serif;
-        background: url("background.jpg") no-repeat center center;
-        background-size: cover;
-        background-attachment: fixed;
-        text-align: center;
-        margin: 0;
-        padding: 20px;
-        color: #fff;
-    }
+  body {
+    font-family: 'Gabriola Regular', sans-serif;
+    background: url("background2.jpg") no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 30px;
+    text-align: center;
+    color: #333;
+    font-size: 30px;
+  }
 
-    h1 {
-        color: #fff;
-        font-family: Georgia, 'Times New Roman', serif;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-    }
+  h1 {
+    color: #fff;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+    font-family: 'Georgia', serif;
+  }
 
-    p {
-        color: #fff;
-        font-weight: bold;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-    }
+  p {
+    color: #f9f9f9;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+  }
 
-    ul#lista {
-        list-style: none;
-        padding: 0;
-        display: grid;
-        grid-template-columns: repeat(2, 300px);
-        gap: 15px 30px;
-        justify-content: center;
-    }
+  ul#lista {
+    list-style: none;
+    padding: 0;
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    justify-items: center;
+  }
 
-    li {
-        background: rgba(255, 255, 255, 0.85);
-        color: #000;
-        padding: 10px;
-        border-radius: 8px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
-    }
+  li {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    padding: 15px;
+    width: 250px;
+    text-align: center;
+    transition: transform 0.2s;
+  }
 
-    li span {
-        text-align: left;
-        flex: 1;
-    }
+  li:hover {
+    transform: scale(1.03);
+  }
 
-    button {
-        background: #6495ED;
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
+  img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
 
-    button:hover {
-        background: #d35b87;
-    }
+  span {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #222;
+  }
 
-    @media (max-width: 600px) {
-        ul#lista {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
+  button {
+    background: #6495ED;
+    color: white;
+    border: none;
+    padding: 7px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
 
-        li {
-            width: 100%;
-        }
-    }
+  button:hover {
+    background: #d35b87;
+  }
+
+  @media (max-width: 600px) {
+    body { padding: 15px; }
+  }
 </style>
 
-<!-- Firebase v12 -->
+<!-- Firebase -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
   import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
@@ -87,7 +95,7 @@
     authDomain: "casamento-mms.firebaseapp.com",
     databaseURL: "https://casamento-mms-default-rtdb.firebaseio.com/",
     projectId: "casamento-mms",
-    storageBucket: "casamento-mms.appspot.com",
+    storageBucket: "casamento-mms.firebasestorage.app",
     messagingSenderId: "152858110235",
     appId: "1:152858110235:web:3647d591b0fb05a518cbbe",
     measurementId: "G-D15NQDBWLS"
@@ -96,153 +104,106 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // Escolher presente
-  async function escolher(botao) {
+  function escolher(botao) {
     const item = botao.parentElement.querySelector("span").innerText;
     const nome = prompt("Digite seu nome para reservar este presente:");
-    if (!nome) return;
-    const itemRef = ref(db, "presentes/" + item);
-    try {
-      await set(itemRef, { nome });
+    if (nome) {
+      const itemRef = ref(db, 'presentes/' + item);
+      set(itemRef, { nome: nome });
       botao.parentElement.remove();
       alert(`Obrigado, ${nome}! Você escolheu: ${item}`);
-    } catch (e) {
-      alert("Erro ao salvar. Tente novamente.");
-      console.error(e);
     }
   }
 
-  // Senha para exportar
   function pedirSenha() {
     const senha = prompt("Digite a senha para acessar:");
     if (senha === "03092025") {
       exportarExcelFirebase();
-    } else if (senha !== null) {
+    } else if(senha !== null) {
       alert("Senha incorreta!");
     }
   }
 
- // Exportar Excel (versão corrigida)
-async function exportarExcelFirebase() {
-  try {
-    // Aguarda carregar a lib XLSX se ainda não estiver disponível
-    if (typeof XLSX === "undefined") {
-      await new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = "https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js";
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
+  async function exportarExcelFirebase() {
+    const snapshot = await get(ref(db, 'presentes'));
+    const dados = snapshot.val() || {};
+    const listaExcel = [];
+    for (let item in dados) {
+      listaExcel.push({ Presente: item, Nome: dados[item].nome });
     }
-
-    const snapshot = await get(ref(db, "presentes"));
-    const dados = snapshot.val();
-
-    if (!dados || Object.keys(dados).length === 0) {
-      alert("Nenhum presente escolhido ainda!");
-      return;
-    }
-
-    // Monta lista pro Excel
-    const listaExcel = Object.keys(dados).map(item => ({
-      Presente: item,
-      Nome: dados[item].nome || ""
-    }));
-
-    // Gera o arquivo Excel
     const ws = XLSX.utils.json_to_sheet(listaExcel);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Presentes");
     XLSX.writeFile(wb, "presentes_escolhidos.xlsx");
-
-  } catch (e) {
-    console.error("Erro ao exportar Excel:", e);
-    alert("Erro ao exportar planilha. Verifique o console (F12).");
   }
-}
 
-  // Atualização em tempo real
-  onValue(ref(db, "presentes"), snapshot => {
+  onValue(ref(db, 'presentes'), (snapshot) => {
     const dados = snapshot.val() || {};
-    document.querySelectorAll("#lista li").forEach(li => {
-      const nomeItem = li.querySelector("span").innerText;
+    document.querySelectorAll('#lista li').forEach(li => {
+      const nomeItem = li.querySelector('span').innerText;
       if (dados[nomeItem]) li.remove();
     });
   });
 
-  // Torna as funções acessíveis globalmente
   window.escolher = escolher;
   window.pedirSenha = pedirSenha;
 </script>
 
-<!-- XLSX -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 </head>
 <body>
 
 <h1>Lista de Presentes</h1>
-<p>Clique em "Escolher" para reservar um presente</p>
+<p style="color: #6495ED;">Clique em "Escolher" para reservar um presente especial ❤️</p>
 
+ 
 <ul id="lista">
-  <li><span>Jogo de Panelas</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Panela de Pressão</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jogo de Talheres</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jogo de Copos</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jogo de Taças</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jogo de Xícaras</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jogo de Louça</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jogo de Facas</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jogo de Assadeiras</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Descanso de Panela</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jogo de Pratos</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Luva Térmica</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Tábua de Corte (Mármore)</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jogo Americano</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Escorredor de Massa</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Pote para Mantimentos</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Medidor de Alimentos</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Ralador</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Escumadeira</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Cortador de Pizza</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Triturador de Alho</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Amassador de Batata</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jogo de Colheres de Silicone</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Tesoura de Cozinha</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Espátula e Pegador</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Colheres de Medida</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Aparador de Panelas</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Fuet</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jogo de Tigelas</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Saladeira</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Saleiro e Pimenteiro</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Açucareiro</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Colher de Sorvete</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Rolo de Massa</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Canecas</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Combucas</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jarra de Suco (Vidro)</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Panela Elétrica de Arroz</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Garrafa de Café</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Chaleira Elétrica</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Pirex</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Jogo de Toalhas (Corpo e Rosto)</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Cestos Organizadores</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Tábua de Passar</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Cesto de Roupa</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Fronhas</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Varal de Roupas</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Mantas e Almofadas (Sofá)</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Edredom</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Colcha</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Protetor de Colchão</span> <button onclick="escolher(this)">Escolher</button></li>
-  <li><span>Organizador de Sapatos</span> <button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="airfryer.png"><span>Airfryer</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./jantar.png"><span>Aparelho de Jantar</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="banqueta.png"><span>Banqueta para bancada</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./batedeira.png"><span>Batedeira</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./cabideiro.png"><span>Cabideiro de madeira</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./cafeteira.png"><span>Cafeteira italiana</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./comoda.png"><span>Cômoda</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./sobremesa.png"><span>Conjunto para sobremesa</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./cuscuzeira.png"><span>Cuscuzeira</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./edredoms.png"><span>Edredoms</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./espremedor.png"><span>Espremedor de Frutas</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./faqueiro.png"><span>Faqueiro</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./ferro.png"><span>Ferro de passar</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./filtro.png"><span>Filtro de água (De barro)</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./forno.png"><span>Forno Elétrico</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./grill.png"><span>Grill</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./jarra.png"><span>Jarra de Vidro</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./cama.png"><span>Jogo de cama (Cores escuras)</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="copos1.png"><span>Jogo Copos</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./panelas.png"><span>Jogo de Panelas</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./talheres.png"><span>Jogo de talheres</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./tapetes.png"><span>Jogo de tapetes</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./toalha de rosto.png"><span>Jogo de toalhas de rosto</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./livreiro.png"><span>Livreiro</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="malas.png"><span>Mala de 10 kg</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./microondas.png"><span>Microondas</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./nicho.png"><span>Nichos de parede</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./pipoqueira.png"><span>Pipoqueira</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./processador.png"><span>Processador de Alimentos</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./puffs.png"><span>Puffs</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./robo.png"><span>Robô aspirador</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./sanduicheira.png"><span>Sanduicheira</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./tacas.png"><span>Taças</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./talheres.png"><span>Travessas</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./toalheiro.png"><span>Toalheiro Térmico</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./torradeira.png"><span>Torradeira</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./travesseiros.png"><span>Travesseiros</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./tv.png"><span>TV 50 polegadas</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./ventilador.png"><span>Ventilador</span><button onclick="escolher(this)">Escolher</button></li>
+  <li><img src="./wap.png"><span>Wap</span><button onclick="escolher(this)">Escolher</button></li>
+ 
 </ul>
 
-<br>
-<button onclick="pedirSenha()">Casamento M&M's</button>
+<br><br>
+<button onclick="pedirSenha()">Baixar lista (Apenas para os noivos)</button>
 
 </body>
 </html>
-
